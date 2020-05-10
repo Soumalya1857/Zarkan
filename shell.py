@@ -1,8 +1,8 @@
-import lexer1
+import interpreter
 
 while True:
     text = input('test > ')
-    result,error = lexer1.run('<stdin>',text)
+    result,error = interpreter.run('<stdin>',text)
 
     if error != None:
         #print("it's an error")

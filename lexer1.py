@@ -388,7 +388,7 @@ class Number:
 					self.context
 				)
 
-			return Number(self.value / other.value).set_context(context), None
+			return Number(self.value / other.value).set_context(self.context), None
 
 	def __repr__(self):
 		return str(self.value)
