@@ -46,6 +46,9 @@ class Lexer:
 			elif self.current_char == '/':
 				tokens.append(Token(TT_DIV, pos_start=self.pos))
 				self.advance()
+			elif self.current_char == '^':
+				tokens.append(Token(TT_POW, pos_start=self.pos))
+				self.advance()
 			elif self.current_char == '(':
 				tokens.append(Token(TT_LPAREN, pos_start=self.pos))
 				self.advance()
@@ -60,6 +63,7 @@ class Lexer:
 
 		tokens.append(Token(TT_EOF, pos_start=self.pos))
 		return tokens, None
+	
 
 	def make_number(self):
 		num_str = ''

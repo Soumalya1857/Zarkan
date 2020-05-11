@@ -2,12 +2,17 @@
 *****1. expression
 *****2. term
 *****3. factor
+*****4. atom
 
 
 expression: term((plus|minus) term)*
 
 term : factor((mul|div) factor)*
 
-factor : int | float
-       : (plus|minus) factor
+factor : (plus|minus) factor
+       : power
+
+power  :  atom (POW factor)*     
+
+atom   : int | float
        : lparen expr rparen 

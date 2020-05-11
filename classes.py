@@ -39,6 +39,7 @@ TT_DIV      = 'DIV'
 TT_LPAREN   = 'LPAREN'
 TT_RPAREN   = 'RPAREN'
 TT_EOF		= 'EOF'
+TT_POW      = 'POW'
 
 class Token:
 	def __init__(self, type_, value=None, pos_start=None, pos_end=None):
@@ -138,6 +139,11 @@ class Number:
 
 			return Number(self.value / other.value).set_context(self.context), None
 
+	def powed_by(self, other):
+		if isinstance(other, Number):
+			return Number(self.value ** other.value).set_context(self.context), None
+
+		
 	def __repr__(self):
 		return str(self.value)
 
