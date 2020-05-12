@@ -24,6 +24,31 @@ class Interpreter:
 			Number(node.tok.value).set_context(context).set_pos(node.pos_start, node.pos_end)
 		)
 
+	def visit_VarAccessNode(self, node, context):
+		res = RTResult()
+
+		var_name = node.var_name_tok.value
+		value = context.symbol_table.get(var_name)
+
+		if not value:
+			return res.faliure(RTError(
+				node.pos_start, node.pos_end,
+				f'{var_name} is not defined',
+				context
+			))
+
+		return res.success(value)
+
+
+	def visit_VarAssignNode(self, node, context):
+		res = RTResult()
+		var_name = node.var_name_tok.value
+		value = res.register(self.visit(node.value_node,context))
+		if res.error: return res
+
+		context.symbol_table.set(var_name, value)
+		return res.success(value)
+
 	def visit_BinOpNode(self, node,context):
 		res = RTResult()
 		left = res.register(self.visit(node.left_node,context))
@@ -66,6 +91,10 @@ class Interpreter:
 # RUN
 #######################################
 
+global_symbol_table = SymbolTable()
+global_symbol_table.set("null",Number(0))
+
+
 def run(fn, text):
 	# Generate tokens
 	lexer = Lexer(fn, text)
@@ -81,6 +110,7 @@ def run(fn, text):
 
 	interpreter = Interpreter()
 	context = Context("<program>")
+	context.symbol_table = global_symbol_table
 	result = interpreter.visit(ast.node,context)
 
 	return result.value, result.error

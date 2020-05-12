@@ -40,6 +40,14 @@ TT_LPAREN   = 'LPAREN'
 TT_RPAREN   = 'RPAREN'
 TT_EOF		= 'EOF'
 TT_POW      = 'POW'
+TT_IDENTIFIER = 'IDENTIFIER'
+TT_KEYWORD  = 'KEYWORD'
+TT_EQ		= 'EQ'
+
+
+KEYWORDS = [
+	'var'
+]
 
 class Token:
 	def __init__(self, type_, value=None, pos_start=None, pos_end=None):
@@ -52,11 +60,14 @@ class Token:
 			self.pos_end.advance()
 
 		if pos_end:
-			self.pos_end = pos_end
+			self.pos_end = pos_end.copy()
 	
 	def __repr__(self):
 		if self.value: return f'{self.type}:{self.value}'
 		return f'{self.type}'
+
+	def matches(self, type_, value):
+		return self.type == type_ and self.value == value
 
 #######################################
 # NODES
@@ -96,6 +107,20 @@ class UnaryOpNode:
 	def __repr__(self):
 		return f'({self.op_tok}, {self.node})'
 
+class VarAccessNode:
+	def __init__(self, var_name_tok):
+		self.var_name_tok = var_name_tok
+
+		self.pos_start = self.var_name_tok.pos_start
+		self.pos_end = self.var_name_tok.pos_end
+
+class VarAssignNode:
+	def __init__(self, var_name_tok, value_node):
+		self.var_name_tok = var_name_tok
+		self.value_node = value_node
+
+		self.pos_start = self.var_name_tok.pos_start
+		self.pos_end = self.var_name_tok.pos_end
 
 
 
@@ -157,4 +182,30 @@ class Context:
 		self.display_name = display_name
 		self.parent = parent
 		self.parent_entry_pos = parent_entry_pos
+		self.symbol_table = None
+
+############################################
+#SYMBOL TABLE CLASS
+## KEEPS TRACK OF ALL THE BASIC VAR NAME BOTH LOCAL AND GLOBAL
+############################################
+
+class SymbolTable:
+	def __init__(self):
+		self.symbols = {}
+		self.parent = None
+
+
+	def get(self,name):
+		value = self.symbols.get(name,None)
+		if value == None and self.parent:
+			return self.parent.get(name)
+		return value
+
+	def set(self, name, value):
+		self.symbols[name] = value
+
+	def remove(self,name):
+		del self.symbols[name]
+
+
 

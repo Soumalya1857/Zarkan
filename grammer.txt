@@ -5,7 +5,8 @@
 *****4. atom
 
 
-expression: term((plus|minus) term)*
+expression    : keyword: var identifier EQ expr
+              : term((plus|minus) term)*
 
 term : factor((mul|div) factor)*
 
@@ -14,5 +15,5 @@ factor : (plus|minus) factor
 
 power  :  atom (POW factor)*     
 
-atom   : int | float
+atom   : int | float | identifier
        : lparen expr rparen 
