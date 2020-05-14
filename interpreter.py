@@ -26,7 +26,6 @@ class Interpreter:
 
 	def visit_VarAccessNode(self, node, context):
 		res = RTResult()
-
 		var_name = node.var_name_tok.value
 		value = context.symbol_table.get(var_name)
 
@@ -36,6 +35,8 @@ class Interpreter:
 				f'{var_name} is not defined',
 				context
 			))
+
+		value = value.copy().set_pos(node.pos_start, node.pos_end)
 
 		return res.success(value)
 
