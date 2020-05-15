@@ -6,7 +6,7 @@ a language you won't understand
 - comparisons work fine
 - file support to be given soon
 
-run `shell.py` ** to run the language shell**
+run `shell.py` **to run the language shell**
  
 `python3 shell.py`
 
