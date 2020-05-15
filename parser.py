@@ -48,6 +48,11 @@ class Parser:
 			self.current_tok = self.tokens[self.tok_idx]
 		return self.current_tok
 
+	def next_token(self):
+		if self.tok_idx + 1 < len(self.tokens):
+			self.next_tok = self.tokens[self.tok_idx + 1]
+		return self.next_tok
+
 	def matches(self, type_, value):
 		return self.type == type_ and self.value == value
 
@@ -118,8 +123,24 @@ class Parser:
 
 	def expr(self):
 		res = ParseResult()
-		# if self.current_tok.type == TT_IDENTIFIER:
-		# 	if 
+
+		#this block reassign var values
+		if self.current_tok.type == TT_IDENTIFIER and self.next_token().type == TT_EQ:
+			var_name = self.current_tok
+			res.register_advancement()
+			self.advance()
+			if self.current_tok.type != TT_EQ:
+				return res.faliure(InvalidSyntaxError(
+					self.current_tok.pos_start, self.current_tok.pos_end,
+					"Expected equals sign"
+				))
+
+			res.register_advancement()
+			self.advance()
+			exp = res.register(self.expr())
+			if res.error: return res
+			return res.success(VarAssignNode(var_name, exp))
+
 
 		if self.current_tok.matches(TT_KEYWORD, 'var'):
 			res.register_advancement()
