@@ -56,7 +56,7 @@ class Parser:
 		if not res.error and self.current_tok.type != TT_EOF:
 			return res.failure(InvalidSyntaxError(
 				self.current_tok.pos_start, self.current_tok.pos_end,
-				"Expected '+', '-', '*' or '/'"
+				"Expected '+', '-', '*','/', '^,'==', '!=', '<', '<=', '>', '>=','and' or 'or'"
 			))
 		return res
 
@@ -76,7 +76,6 @@ class Parser:
 			return res.success(VarAccessNode(tok))
 
 		elif tok.type == TT_LPAREN:
-			
 			self.advance()
 			expr = res.register(self.expr())
 			if res.error: return res
@@ -113,46 +112,77 @@ class Parser:
 		return self.power()
 		
 
+	def comp_expr(self):
+		res = ParseResult()
+
+		if self.current_tok.matches(TT_KEYWORD, "not"):
+			op_tok = self.current_tok
+			res.register_advancement()
+			self.advance()
+
+			node = res.register(self.comp_expr())
+			if res.error: return res
+			return res.sucess(UnaryOpNode(op_tok, node))
+
+		#we are looking at second part of the grammer
+		node = res.register(self.bin_op(self.arith_expr, (TT_NE,TT_EE,TT_GT,TT_GTE,TT_LT,TT_LTE)))
+
+		if res.error:
+			return res.failure(InvalidSyntaxError(
+				self.current_tok.pos_start, self.current_tok.pos_end,
+				"Expected int or float,identifier, '+', '-' ,'(' or 'not'"
+			))
+
+		return res.success(node)
+
+	def arith_expr(self):
+		return self.bin_op(self.term, (TT_PLUS,TT_MINUS))
+
 	def term(self):
 		return self.bin_op(self.factor, (TT_MUL, TT_DIV))
 
+
 	def expr(self):
 		res = ParseResult()
-		# if self.current_tok.type == TT_IDENTIFIER:
-		# 	if 
 
 		if self.current_tok.matches(TT_KEYWORD, 'var'):
 			res.register_advancement()
 			self.advance()
+
 			if self.current_tok.type != TT_IDENTIFIER:
-				return res.faliure(InvalidSyntaxError(
+				return res.failure(InvalidSyntaxError(
 					self.current_tok.pos_start, self.current_tok.pos_end,
 					"Expected identifier"
-				))	
+				))
 
 			var_name = self.current_tok
 			res.register_advancement()
 			self.advance()
 
 			if self.current_tok.type != TT_EQ:
-				return res.faliure(InvalidSyntaxError(
+				return res.failure(InvalidSyntaxError(
 					self.current_tok.pos_start, self.current_tok.pos_end,
-					"Expected equals sign"
+					"Expected '='"
 				))
 
 			res.register_advancement()
 			self.advance()
-			exp = res.register(self.expr())
+			expr = res.register(self.expr())
 			if res.error: return res
-			return res.success(VarAssignNode(var_name, exp))
+			return res.success(VarAssignNode(var_name, expr))
 
-		node =  res.register(self.bin_op(self.term, (TT_PLUS, TT_MINUS)))
-		if res.error: 
-			return res.faliure(InvalidSyntaxError(
-				"Expected 'var', int , float, identifier, '+', '-' or '('"
+		# node = res.register(self.bin_op(self.term, (TT_PLUS, TT_MINUS)))
+		node = res.register(self.bin_op(self.comp_expr, ((TT_KEYWORD, 'and'), (TT_KEYWORD, 'or'))))
+
+		if res.error:
+			return res.failure(InvalidSyntaxError(
+				self.current_tok.pos_start, self.current_tok.pos_end,
+				"Expected 'VAR', int, float, identifier, '+', '-' or '('"
 			))
 
 		return res.success(node)
+
+
 
 	###################################
 
@@ -164,7 +194,7 @@ class Parser:
 		left = res.register(func_a())
 		if res.error: return res
 
-		while self.current_tok.type in ops:
+		while self.current_tok.type in ops or (self.current_tok.type, self.current_tok.value) in ops:
 			op_tok = self.current_tok
 			res.register_advancement()
 			self.advance()
@@ -177,6 +207,7 @@ class Parser:
 #######################################
 # RUNTIME RESULT
 #######################################
+
 
 class RTResult:
 	def __init__(self):

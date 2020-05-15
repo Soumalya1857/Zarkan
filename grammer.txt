@@ -6,14 +6,19 @@
 
 
 expression    : keyword: var identifier EQ expr
-              : term((plus|minus) term)*
+              : comp-expr((AND | OR) comp-expr)*
+              
+comp-expr     : NOT comp-expr
+              : arith_expr ((EE| LT| GT| LTE| GTE) arith_expr)
 
-term : factor((mul|div) factor)*
+arith-expr    : term((plus|minus) term)*
 
-factor : (plus|minus) factor
-       : power
+term          : factor((mul|div) factor)*
 
-power  :  atom (POW factor)*     
+factor        : (plus|minus) factor
+              : power
 
-atom   : int | float | identifier
-       : lparen expr rparen 
+power         :  atom (POW factor)*     
+
+atom          : int | float | identifier
+              : lparen expr rparen 
