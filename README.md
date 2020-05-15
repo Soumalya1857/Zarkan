@@ -6,24 +6,24 @@ normal var can be declared and used with var keyword
 works only in terminal
 
 file support to be given soon
-
+\n
 RUN shell.py TO RUN THE LANGUAGE SHELL
-command:
+\ncommand:
 
-python3 shell.py
+\npython3 shell.py
 
 
 #sample code
 
->>> 23 > 5
+test> 23 > 5
 1
->>> var a = 5
+test> var a = 5
 5
->>> 34 + a
+test> 34 + a
 39
->>> 6 == 5
+test> 6 == 5
 0
->>> 7 == 7
+test> 7 == 7
 1 
 
 
