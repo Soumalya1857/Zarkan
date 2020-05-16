@@ -23,10 +23,17 @@ power         :  atom (POW factor)*
 atom          : int | float | identifier
               : lparen expr rparen
               : if-expr rule
+              : for-expr
+              : while-expr
 
 if-expr       : KEYWORD: if expr KEYWORD: then expr
               : {KEYWORD: elif expr KEYWORD: then expr}*
               : {KEYWORD: else expr}?
+
+for-expr      : KEYWORD:for identifier EQ expr KEYWORD:to expr
+                (KEYWORD:step expr)? KEYWORD:then expr
+
+while-expr    : KEYWORD:while expr KEYWORD:then expr 
 
 
 * = 0 or more
