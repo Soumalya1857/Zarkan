@@ -1,7 +1,7 @@
 import interpreter
 
 while True:
-    text = input('test > ')
+    text = input('>>>> ')
     result,error = interpreter.run('<stdin>',text)
 
     if error != None:
