@@ -65,6 +65,31 @@ class Parser:
 			))
 		return res
 
+	def if_expr(self):
+		res = ParseResult()
+		cases = []
+		else_case = None
+
+		if not self.current_tok.matches(TT_KEYWORD, 'if'):
+			return res.failure(InvalidSyntaxError(
+				self.current_tok.pos_start, self.current_tok.pos_end,
+				"Expected 'if'"
+			))
+
+		res.register_advancement()
+		self.advance()
+
+		condition = res.register(self.expr())
+		if res.error: return res
+
+		if not self.current_tok.matches(TT_KEYWORD, 'then'):
+			return res.faliure(InvalidSyntaxError(
+				self.current_tok.pos_start, self.current_tok.pos_end,
+				"Expected 'then'"
+			))
+		
+
+
 	###################################
 	def atom(self):
 		res = ParseResult()
@@ -93,6 +118,11 @@ class Parser:
 					self.current_tok.pos_start, self.current_tok.pos_end,
 					"Expected ')'"
 				))
+
+		elif tok.matches(TT_KEYWORD, 'if'):
+			if_expr = res.register(self.if_expr())
+			if res.error: return res
+			return res.success(if_expr)
 
 		return res.failure(InvalidSyntaxError(
 			tok.pos_start, tok.pos_end,

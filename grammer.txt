@@ -21,4 +21,13 @@ factor        : (plus|minus) factor
 power         :  atom (POW factor)*     
 
 atom          : int | float | identifier
-              : lparen expr rparen 
+              : lparen expr rparen
+              : if-expr rule
+
+if-expr       : KEYWORD: if expr KEYWORD: then expr
+              : {KEYWORD: elif expr KEYWORD: then expr}*
+              : {KEYWORD: else expr}?
+
+
+* = 0 or more
+? = optional
