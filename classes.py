@@ -136,6 +136,13 @@ class VarAssignNode:
 		self.pos_start = self.var_name_tok.pos_start
 		self.pos_end = self.var_name_tok.pos_end
 
+class IfNode:
+	def __init__(self, cases, else_case):
+		self.cases = cases
+		self.else_case = else_case
+
+		self.pos_start = self.cases[0][0].pos_start
+		self.pos_end = (self.else_case if self.else_case != None else self.cases[len(self.cases)-1][0]).pos_end
 
 
 #######################################
@@ -218,7 +225,10 @@ class Number:
 		if isinstance(other,Number):
 			return Number(1 if self.value == 0 else 0).set_context(self.context),None
 
-			
+
+	def is_true(self):
+		return self.value != 0
+
 	def copy(self):
 		copy = Number(self.value)
 		copy.set_pos(self.pos_start, self.pos_end)

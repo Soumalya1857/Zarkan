@@ -5,8 +5,6 @@ while True:
     result,error = interpreter.run('<stdin>',text)
 
     if error != None:
-    
         print(error.as_string())
-    else:
-        
+    elif result:
         print(result)
