@@ -18,13 +18,16 @@ term          : factor((mul|div) factor)*
 factor        : (plus|minus) factor
               : power
 
-power         :  atom (POW factor)*     
+power         :  call (POW factor)*    
+
+call          : atom (lparen (expr(comma expr)*)? rparen)?
 
 atom          : int | float | identifier
               : lparen expr rparen
               : if-expr rule
               : for-expr
               : while-expr
+              : func definition
 
 if-expr       : KEYWORD: if expr KEYWORD: then expr
               : {KEYWORD: elif expr KEYWORD: then expr}*
@@ -34,6 +37,10 @@ for-expr      : KEYWORD:for identifier EQ expr KEYWORD:to expr
                 (KEYWORD:step expr)? KEYWORD:then expr
 
 while-expr    : KEYWORD:while expr KEYWORD:then expr 
+
+func-def      : KEYWORD:func identifier
+                lparen (identifier(comma identifier)*)? rparen
+                arrow expr
 
 
 * = 0 or more
