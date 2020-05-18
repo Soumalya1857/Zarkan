@@ -252,7 +252,7 @@ class Parser:
 			if self.current_tok.type != TT_RPAREN:
 				return res.faliure(InvalidSyntaxError(
 					self.current_tok.pos_start, self.current_tok.pos_end,
-					"Expected ',' or ')"
+					"Expected ',' or ')'"
 					))
 
 		else:
