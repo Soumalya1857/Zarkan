@@ -526,7 +526,7 @@ class Number(Value):
 
 
 
-class function(Value):
+class Function(Value):
 	def __init__(self, name, body_node, arg_names):
 		super().__init__()
 		self.name = name
@@ -589,9 +589,9 @@ class Context:
 ############################################
 
 class SymbolTable:
-	def __init__(self):
+	def __init__(self, parent=None):
 		self.symbols = {}
-		self.parent = None
+		self.parent = parent
 
 
 	def get(self,name):
