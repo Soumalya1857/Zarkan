@@ -31,6 +31,7 @@ class Function(Value):
 
 		if len(args) > len(self.arg_names):
 			return res.faliure(RTError(
+				self.pos_start, self.pos_end,
 				f"{len(args)-len(self.arg_names)} too many args passed into '{self.name}'",
 				self.context
 			))

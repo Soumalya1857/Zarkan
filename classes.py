@@ -220,7 +220,7 @@ class RTResult:
 		self.value = value
 		return self
 
-	def failure(self, error):
+	def faliure(self, error):
 		self.error = error
 		return self
 
