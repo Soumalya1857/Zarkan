@@ -307,7 +307,7 @@ class Parser:
 					res.register_advancement()
 					self.advance()
 
-					arg_nodes.append(res.register(self.expr))
+					arg_nodes.append(res.register(self.expr()))
 					if res.error: return res
 				
 				if self.current_tok.type != TT_RPAREN:
