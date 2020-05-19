@@ -1,7 +1,7 @@
 
 
 from error import *
-from interpreter import *
+#from interpreter import Interpreter
 #######################################
 # POSITION
 #######################################
@@ -184,7 +184,10 @@ class FuncDefNode:
 		elif len(self.arg_name_toks) > 0:
 			self.pos_start = self.arg_name_toks[0].pos_start
 		else:
-			self.pos_start = self.body_node.pos_end
+			self.pos_start = self.body_node.pos_start
+
+		self.pos_end = self.body_node.pos_end
+
 
 class CallNode:
 	def __init__(self, node_to_call, arg_nodes):
@@ -217,7 +220,7 @@ class RTResult:
 		self.value = value
 		return self
 
-	def failure(self, error):
+	def faliure(self, error):
 		self.error = error
 		return self
 
@@ -526,49 +529,57 @@ class Number(Value):
 
 
 
-class function(Value):
-	def __init__(self, name, body_node, arg_names):
-		super().__init__()
-		self.name = name
-		self.body_node = body_node
-		self.arg_names = arg_names
+# class Function(Value):
+# 	def __init__(self, name, body_node, arg_names):
+# 		super().__init__()
+# 		self.name = name
+# 		self.body_node = body_node
+# 		self.arg_names = arg_names
 
-	def execute(self,args):
-		res = RTReult()
-		interpreter = interpreter()
-		new_context = Context(self.name, self.context, self.pos_start)
+# 	def execute(self,args):
+# 		# res = RTResult()
+# 		# interpreter = Interpreter()
+# 		# new_context = Context(self.name, self.context, self.pos_start)
 
-		if len(args) > len(self.arg_names):
-			return res.faliure(RTError(
-				f"{len(args)-len(self.arg_names)} too many args passed into '{self.name}'",
-				self.context
-			))
 
-		if len(args) < len(self.arg_names):
-			return res.faliure(RTError(
-				self.pos_start, self.pos_end,
-				f"{len(self.arg_names)-len(args)} too few args passed into '{self.name}'",
-				self.context
-			))
+# 		res = RTResult()
+# 		interpreter = Interpreter()
+# 		new_context = Context(self.name, self.context, self.pos_start)
+# 		new_context.symbol_table = SymbolTable(new_context.parent.symbol_table)
 
-		for i in range(len(args)):
-			arg_name = self.arg_names[i]
-			arg_value = args[i]
-			arg_value.set_context(new_context)
-			new_context.symbol_table.set(arg_name, arg_value)
 
-		value = res.register(interpreter.visit(self.body, new_context))
-		if res.error: return res
-		return res.success(value)
 
-	def copy(self):
-		copy = Function(self.name, self.body_node, self.arg_names)
-		copy.set_context(self.context)
-		copy.set_pos(self.pos_start, self.pos_end)
-		return copy
+# 		if len(args) > len(self.arg_names):
+# 			return res.faliure(RTError(
+# 				f"{len(args)-len(self.arg_names)} too many args passed into '{self.name}'",
+# 				self.context
+# 			))
 
-	def __repr__(self):
-		return f"<function {self.name}>"
+# 		if len(args) < len(self.arg_names):
+# 			return res.faliure(RTError(
+# 				self.pos_start, self.pos_end,
+# 				f"{len(self.arg_names)-len(args)} too few args passed into '{self.name}'",
+# 				self.context
+# 			))
+
+# 		for i in range(len(args)):
+# 			arg_name = self.arg_names[i]
+# 			arg_value = args[i]
+# 			arg_value.set_context(new_context)
+# 			new_context.symbol_table.set(arg_name, arg_value)
+
+# 		value = res.register(interpreter.visit(self.body, new_context))
+# 		if res.error: return res
+# 		return res.success(value)
+
+# 	def copy(self):
+# 		copy = Function(self.name, self.body_node, self.arg_names)
+# 		copy.set_context(self.context)
+# 		copy.set_pos(self.pos_start, self.pos_end)
+# 		return copy
+
+# 	def __repr__(self):
+# 		return f"<function {self.name}>"
 
 
 
@@ -589,9 +600,9 @@ class Context:
 ############################################
 
 class SymbolTable:
-	def __init__(self):
+	def __init__(self, parent=None):
 		self.symbols = {}
-		self.parent = None
+		self.parent = parent
 
 
 	def get(self,name):

@@ -198,7 +198,7 @@ class Parser:
 	def func_def(self):
 		res = ParseResult()
 
-		if self.current_tok.matches(TT_KEYWORD, 'func'):
+		if not self.current_tok.matches(TT_KEYWORD, 'func'):
 			return res.faliure(InvalidSyntaxError(
 				self.current_tok.pos_start, self.current_tok.pos_end,
 				"Expected 'func'"
@@ -211,7 +211,7 @@ class Parser:
 			var_name_tok = self.current_tok
 			res.register_advancement()
 			self.advance()
-			if self.current_tok.type == TT_LPAREN:
+			if self.current_tok.type != TT_LPAREN:
 				return res.faliure(InvalidSyntaxError(
 					self.current_tok.pos_start, self.current_tok.pos_end,
 					"Expected '('"
@@ -219,7 +219,7 @@ class Parser:
 
 		else:
 			var_name_tok = None
-			if self.current_tok.type == TT_LPAREN:
+			if self.current_tok.type != TT_LPAREN:
 				return res.faliure(InvalidSyntaxError(
 					self.current_tok.pos_start, self.current_tok.pos_end,
 					"Expected '(' or identifier"
@@ -238,7 +238,7 @@ class Parser:
 				res.register_advancement()
 				self.advance()
 
-				if self.current_tok.type == TT_IDENTIFIER:
+				if self.current_tok.type != TT_IDENTIFIER:
 					return res.faliure(InvalidSyntaxError(
 						self.current_tok.pos_start, self.current_tok.pos_end,
 						"Expected identifier"
@@ -249,15 +249,15 @@ class Parser:
 				self.advance()
 
 		
-			if self.current_tok.type == TT_RPAREN:
+			if self.current_tok.type != TT_RPAREN:
 				return res.faliure(InvalidSyntaxError(
 					self.current_tok.pos_start, self.current_tok.pos_end,
-					"Expected ',' or ')"
+					"Expected ',' or ')'"
 					))
 
 		else:
 
-			if self.current_tok.type == TT_RPAREN:
+			if self.current_tok.type != TT_RPAREN:
 				return res.faliure(InvalidSyntaxError(
 					self.current_tok.pos_start, self.current_tok.pos_end,
 					"Expected identifier or ')'"
@@ -266,7 +266,7 @@ class Parser:
 		res.register_advancement()
 		self.advance()
 
-		if self.current_tok.type == TT_ARROW:
+		if self.current_tok.type != TT_ARROW:
 			return res.faliure(InvalidSyntaxError(
 				self.current_tok.pos_start, self.current_tok.pos_end,
 				"Expected '->'"
@@ -287,7 +287,7 @@ class Parser:
 		atom = res.register(self.atom())
 		if res.error: return res
 
-		if self.current_tok.type == TT_RPAREN:
+		if self.current_tok.type == TT_LPAREN:
 			res.register_advancement()
 			self.advance()
 
@@ -307,10 +307,10 @@ class Parser:
 					res.register_advancement()
 					self.advance()
 
-					arg_nodes.append(res.register(self.expr))
+					arg_nodes.append(res.register(self.expr()))
 					if res.error: return res
 				
-				if self.current_tok.type == TT_RPAREN:
+				if self.current_tok.type != TT_RPAREN:
 					return res.failure(InvalidSyntaxError(
 						self.current_tok.pos_start, self.current_tok.pos_end,
 						"Expected '',' or ')'"
@@ -370,13 +370,13 @@ class Parser:
 			return res.success(while_expr)
 
 		elif tok.matches(TT_KEYWORD, 'func'):
-			while_expr = res.register(self.func_def())
+			func_expr = res.register(self.func_def())
 			if res.error: return res
-			return res.success(func_def)
+			return res.success(func_expr)
 
 		return res.failure(InvalidSyntaxError(
 			tok.pos_start, tok.pos_end,
-			"Expected int or float,identifier, '+', '-' or '(' "
+			"Expected int or float,identifier, 'if', 'for', 'while', 'func', '+', '-' or '(' "
 		))
 
 		
