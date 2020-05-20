@@ -63,6 +63,8 @@ class Lexer:
 			elif self.current_char == ',':
 				tokens.append(Token(TT_COMMA, pos_start=self.pos))
 				self.advance()
+			elif self.current_char == '"':
+				tokens.append(self.make_string())
 			elif self.current_char == '!':
 				tok, error = make_not_equals()
 				if error: return [], error
@@ -171,6 +173,34 @@ class Lexer:
 			tok_type = TT_ARROW
 
 		return Token(tok_type, pos_start=pos_start, pos_end=self.pos)
+
+
+	def make_string(self):
+		string = ""
+		pos_start = self.pos.copy()
+		escape_char = False
+		self.advance()
+
+		escape_characters = {
+			'n': '\n',
+			't': '\t',
+			'0' : '\0'
+		}
+
+		while self.current_char != None and (self.current_char != '"' or escape_char):
+			if escape_char:
+				string += escape_characters.get(self.current_char, self.current_char)
+				escape_char == False
+			else:
+				if self.current_char == '\\':
+					escape_char = True
+				else: 
+					string += self.current_char
+			self.advance()
+			
+
+		self.advance()
+		return Token(TT_STRING, string, pos_start, self.pos)
 
 
 

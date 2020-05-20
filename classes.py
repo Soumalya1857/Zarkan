@@ -52,6 +52,8 @@ TT_EQ		= 'EQ'
 TT_EE 		= 'EE' #double equals
 TT_COMMA	= 'COMMA'
 TT_ARROW	= 'ARROW'
+TT_STRING	= 'STRING'
+
 
 
 
@@ -97,6 +99,16 @@ class Token:
 #######################################
 
 class NumberNode:
+	def __init__(self, tok):
+		self.tok = tok
+
+		self.pos_start = self.tok.pos_start
+		self.pos_end = self.tok.pos_end
+
+	def __repr__(self):
+		return f'{self.tok}'
+
+class StringNode:
 	def __init__(self, tok):
 		self.tok = tok
 

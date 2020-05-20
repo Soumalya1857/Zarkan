@@ -22,7 +22,7 @@ power         :  call (POW factor)*
 
 call          : atom (lparen (expr(comma expr)*)? rparen)?
 
-atom          : int | float | identifier
+atom          : int | float | identifier | string
               : lparen expr rparen
               : if-expr rule
               : for-expr
