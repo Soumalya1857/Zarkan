@@ -5,8 +5,10 @@ a language you won't understand
 - variables can be declared with var keyword
 - comparisons work fine
 - if else is working fine
+- support for strings given(addition and multiplications)
 - support for loops(for and while) given
 - file support to be given soon
+- various functions to be added
 
 run `shell.py` **to enter the language shell**
  
@@ -32,6 +34,10 @@ run `shell.py` **to enter the language shell**
 >>>> for i = 0 to 10 step 2 then p = p+1
 >>>> p
 26
-(10 + 0 + 2 + 4 + 8)
+#(10 + 0 + 2 + 4 + 8)
+>>>> func greet(name, number) -> "Hello" * 3 + name
+<function greet>
+>>>> greet(Ninja,3)
+Hello Hello Hello Ninja
 ```
 adding this for initial commit in feature1
