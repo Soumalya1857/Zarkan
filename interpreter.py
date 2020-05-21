@@ -94,6 +94,8 @@ class String(Value):
 		return f"{self.value}"	
 
 
+class List(Value):
+	def
 
 #######################################
 # INTERPRETER

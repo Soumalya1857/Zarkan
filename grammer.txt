@@ -25,9 +25,12 @@ call          : atom (lparen (expr(comma expr)*)? rparen)?
 atom          : int | float | identifier | string
               : lparen expr rparen
               : if-expr rule
+              : list_expr
               : for-expr
               : while-expr
               : func definition
+
+list-expr     : LSQUARE (expr(comma expr)*)? RSQUARE
 
 if-expr       : KEYWORD: if expr KEYWORD: then expr
               : {KEYWORD: elif expr KEYWORD: then expr}*

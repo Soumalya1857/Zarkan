@@ -53,9 +53,8 @@ TT_EE 		= 'EE' #double equals
 TT_COMMA	= 'COMMA'
 TT_ARROW	= 'ARROW'
 TT_STRING	= 'STRING'
-
-
-
+TT_LSQUARE  = 'LSQUARE'
+TT_RSQUARE  = 'RSQUARE'
 
 
 KEYWORDS = [
@@ -117,6 +116,13 @@ class StringNode:
 
 	def __repr__(self):
 		return f'{self.tok}'
+
+class ListNode:
+	def __init__(self, element_nodes, pos_start, pos_end):
+		self.element_nodes = element_nodes
+
+		self.pos_start = pos_start
+		self.pos_end = pos_end
 
 class BinOpNode:
 	def __init__(self, left_node, op_tok, right_node):
