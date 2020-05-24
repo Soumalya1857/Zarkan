@@ -95,7 +95,64 @@ class String(Value):
 
 
 class List(Value):
-	def
+	def __init__(self, elements):
+		super().__init__()
+		self.elements = elements
+
+	def added_to(self, other):
+		new_list = self.copy()
+		new_list.elements.append(other)
+		return new_list, None
+
+	def subbed_by(self, other):
+		if isinstance(self, other):
+			new_list = self.copy()
+			try:
+				new_list.elements.pop(other.value)
+				return new_list, None
+			except:
+				return None, RTError(
+					other.pos_start, other.pos_end,
+					"Element at this index could not be removed from list because index is out of bound!!",
+					self.context
+				)
+		else:
+			return None, Value.illegal_operation(self, other)
+
+	def multed_by(self,other):
+		if isinstance(other, List):
+			new_list = self.copy()
+			new_list.elements.extend(other.elements)
+			return new_list, None
+		else:
+			return None, Value.illegal_operation(self, other)
+
+	def dived_by(self, other):
+		if isinstance(self, other):
+			new_list = self.copy()
+			try:
+				new_list.elements[other.value]
+				return new_list, None
+			except:
+				return None, RTError(
+					other.pos_start, other.pos_end,
+					"Element at this index could not be retrieved from list because index is out of bound!!",
+					self.context
+				)
+		else:
+			return None, Value.illegal_operation(self, other)	
+
+	def copy(self):
+		copy = List(self.elements[:])
+		copy.set_pos(self.pos_start, self.pos_end)
+		copy.set_context(self.context)
+		return copy
+
+	# def __repr__(self):
+	#  return f"[{", ".join([str(x) for x in self.elements])}]"
+
+	def __repr__(self):
+		return f'[{", ".join([str(x) for x in self.elements])}]'
 
 #######################################
 # INTERPRETER
@@ -230,6 +287,7 @@ class Interpreter:
 
 	def visit_ForNode(self, node, context):
 		res = RTResult()
+		elements = []
 
 		start_value = res.register(self.visit(node.start_value_node, context))
 		if res.error: return res
@@ -254,13 +312,16 @@ class Interpreter:
 			context.symbol_table.set(node.var_name_tok.value, Number(i))
 			i += step_value.value
 
-			res.register(self.visit(node.body_node, context))
+			elements.append(res.register(self.visit(node.body_node, context)))
 			if res.error: return res
 
-		return res.success(None)
+		return res.success(
+			List(elements).set_context(context).set_pos(node.pos_start, node.pos_end)
+		)
 
 	def visit_WhileNode(self, node, context):
 		res = RTResult()
+		elements = []
 
 		while True:
 			condition = res.register(self.visit(node.condition_node, context))
@@ -268,10 +329,12 @@ class Interpreter:
 
 			if not condition.is_true(): break
 
-			res.register(self.visit(node.body_node, context))
+			elements.append(res.register(self.visit(node.body_node, context)))
 			if res.error: return res
 
-		return res.success(None)
+		return res.success(
+			List(elements).set_context(context).set_pos(node.pos_start, node.pos_end)
+		)
 
 
 
@@ -305,6 +368,19 @@ class Interpreter:
 		if res.error: return res
 
 		return res.success(return_value)
+
+
+	def visit_ListNode(self, node, context):
+		res = RTResult()
+		elements = []
+
+		for element_node in node.element_nodes:
+			elements.append(res.register(self.visit(element_node, context)))
+			if res.error: return res
+
+		return res.success(
+			List(elements).set_context(context).set_pos(node.pos_start, node.pos_end)
+		)
 
 
 
