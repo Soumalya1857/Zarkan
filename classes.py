@@ -545,6 +545,9 @@ class Number(Value):
 	def __repr__(self):
 		return str(self.value)
 
+	Number.true = Number(1)
+	Number.false = Number(0)
+	Number.null = Number(0)
 
 
 # class Function(Value):
