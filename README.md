@@ -9,6 +9,8 @@ a language you won't understand
 - support for loops(for and while) given
 - file support to be given soon
 - various functions to be added
+- will add a proper documentation for this language
+- support for built in functions are given
 
 run `shell.py` **to enter the language shell**
  
