@@ -1,6 +1,7 @@
 
 
 from error import *
+import math
 #from interpreter import Interpreter
 #######################################
 # POSITION
@@ -545,9 +546,10 @@ class Number(Value):
 	def __repr__(self):
 		return str(self.value)
 
-	Number.true = Number(1)
-	Number.false = Number(0)
-	Number.null = Number(0)
+Number.true = Number(1)
+Number.false = Number(0)
+Number.null = Number(0)
+Number.math_pi = Number(math.pi)
 
 
 # class Function(Value):
