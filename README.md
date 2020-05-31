@@ -11,6 +11,8 @@ a language you won't understand
 - various functions to be added
 - will add a proper documentation for this language
 - support for built in functions are given
+- multi line functionality added
+- documentation is on its way
 
 run `shell.py` **to enter the language shell**
  
