@@ -2,6 +2,7 @@ import interpreter
 
 while True:
     text = input('>>>> ')
+    if text.strip() == "": continue
     result,error = interpreter.run('<stdin>',text)
 
     if error != None:
