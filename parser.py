@@ -16,8 +16,18 @@ class Parser:
 
 	def advance(self, ):
 		self.tok_idx += 1
-		if self.tok_idx < len(self.tokens):
+		# if self.tok_idx < len(self.tokens):
+		# 	self.current_tok = self.tokens[self.tok_idx]
+		self.update_current_tok()
+		return self.current_tok
+
+	def update_current_tok(self):
+		if self.tok_idx >= 0 and self.tok_idx < len(self.tokens):
 			self.current_tok = self.tokens[self.tok_idx]
+
+	def reverse(self, amount = 1):
+		self.tok_idx -= amount
+		self.update_current_tok()
 		return self.current_tok
 
 	def next_token(self):
@@ -29,7 +39,7 @@ class Parser:
 		return self.type == type_ and self.value == value
 
 	def parse(self):
-		res = self.expr()
+		res = self.statements()
 		if not res.error and self.current_tok.type != TT_EOF:
 			return res.failure(InvalidSyntaxError(
 				self.current_tok.pos_start, self.current_tok.pos_end,
@@ -547,6 +557,45 @@ class Parser:
 		return res.success(node)
 
 
+
+	def statements(self):
+		res = ParseResult()
+		statements = []
+		pos_start = self.current_tok.pos_start.copy()
+
+		while self.current_tok.type == TT_NEWLINE:
+			res.register_advancement()
+			self.advance()
+
+		statement = res.register(self.expr())
+		if res.error: return res
+		statements.append(statement)
+
+		more_statement = True
+		while True:
+			newline_count = 0
+			while self.current_tok.type == TT_NEWLINE:
+				res.register_advancement()
+				self.advance()
+				newline_count += 1
+			if newline_count == 0:
+				more_statement = False
+			if not more_statement:
+				break
+			statement = res.try_register(self.expr())
+			if not statement:
+				self.reverse(res.to_reverse_count)
+				more_statement = False
+				continue
+			statements.append(statement)
+
+		return res.success(
+			ListNode(
+				statements,
+				pos_start,
+				self.current_tok.pos_end.copy()
+			)
+		)
 
 	###################################
 

@@ -56,6 +56,7 @@ TT_ARROW	= 'ARROW'
 TT_STRING	= 'STRING'
 TT_LSQUARE  = 'LSQUARE'
 TT_RSQUARE  = 'RSQUARE'
+TT_NEWLINE	= 'NEWLINE'
 
 
 KEYWORDS = [
@@ -71,7 +72,8 @@ KEYWORDS = [
 	'to',
 	'step',
 	'while',
-	'func'
+	'func',
+	'end'
 ]
 
 class Token:
@@ -232,6 +234,7 @@ class RTResult:
 		self.error = None
 
 	def register(self, res):
+
 		if res.error: self.error = res.error
 		return res.value
 
@@ -253,16 +256,26 @@ class ParseResult:
 	def __init__(self):
 		self.error = None
 		self.node = None
+		self.last_registered_advance_count = 0
 		self.advance_count = 0 # count number of advancements in particular expr
+		self.to_reverse_count = 0
 
 	def register_advancement(self):
 		self.advance_count += 1
+		self.last_registered_advance_count = 1
 
 	def register(self, res):
+		self.last_registered_advance_count = res.advance_count
 		self.advance_count += res.advance_count
 		if res.error: self.error = res.error
 		return res.node
 
+	def try_register(self,res):
+		if res.error:
+			self.to_reverse_count = res.advance_count
+			#self.advance_count += res.advance_count
+			return None # in case of faliure
+		return self.register(res)
 
 	def success(self, node):
 		self.node = node
