@@ -151,7 +151,7 @@ class BuiltInFunction(BaseFunction):
 		return RTResult().success(Number(number))
 	execute_input.arg_names = []
 
-	def execute_clear(self):
+	def execute_clear(self,exec_cntx):
 		os.system('cls' if os.name == 'nt' else 'clear')
 		return RTResult().success(Number.null)
 	execute_clear.arg_names = []
