@@ -110,13 +110,13 @@ class Parser:
 		cases = []
 		else_cases = None
 
-		if not self.current_tok.matches(TT_KEYWORD, cases_keyword):
+		if not self.current_tok.matches(TT_KEYWORD, case_keyword):
 			return res.faliure(InvalidSyntaxError(
 				self.current_tok.pos_start, self.current_tok.pos_end,
 	 			f'Expected {case_keyword}'
 			))
 		res.register_advancement()
- 		self.advance()
+		self.advance()
 
 		condition = res.register(self.expr())
 		if res.error: return res
@@ -126,8 +126,8 @@ class Parser:
 	 			self.current_tok.pos_start, self.current_tok.pos_end,
 	 			"Expected 'then'"
 	 		))
-	 	res.register_advancement()
-	 	self.advance()
+		res.register_advancement()
+		self.advance()
 
 		if self.current_tok.type == TT_NEWLINE:
 			res.register_advancement()
@@ -150,7 +150,7 @@ class Parser:
 			if res.error: return res
 			cases.append((condition, expr, False))
 
-			all_cases = res.register(self.if_expr_else_or_elif())
+			all_cases = res.register(self.if_expr_else_of_elif())
 			if res.error: return res
 			new_cases, else_cases = all_cases
 			cases.extend(new_cases)
@@ -280,10 +280,26 @@ class Parser:
 		res.register_advancement()
 		self.advance()
 
+		if self.current_tok.type == TT_NEWLINE:
+			res.register_advancement()
+			self.advance()
+
+			body = res.register(self.statements())
+			if res.error: return res
+
+			if not self.current_tok.matches(TT_KEYWORD, 'end'):
+				return res.faliure(InvalidSyntaxError(
+	 			self.current_tok.pos_start, self.current_tok.pos_end,
+	 			"Expected 'end'"
+	 			)) 
+			res.register_advancement()
+			self.advance()
+			return res.success(ForNode(var_name, start_value, end_value,step_value,body,True))
+
 		body = res.register(self.expr())
 		if res.error: return res
 
-		return res.success(ForNode(var_name,start_value,end_value,step_value,body))
+		return res.success(ForNode(var_name,start_value,end_value,step_value,body,False))
 
 
 	def while_expr(self):
@@ -310,10 +326,28 @@ class Parser:
 		res.register_advancement()
 		self.advance()
 
+		if self.current_tok.type == TT_NEWLINE:
+			res.register_advancement()
+			self.advance()
+
+			body = res.register(self.statements())
+			if res.error: return res
+
+			if not self.current_tok.matches(TT_KEYWORD, 'end'):
+				return res.faliure(InvalidSyntaxError(
+				self.current_tok.pos_start, self.current_tok.pos_end,
+				"Expected 'end'"
+				))
+			res.register_advancement()
+			self.advance()
+
+			return res.success(WhileNode(condition, body, True))
+
+
 		body = res.register(self.expr())
 		if res.error: return res
 
-		return res.success(WhileNode(condition, body))
+		return res.success(WhileNode(condition, body, False))
 
 
 	def func_def(self):
@@ -387,20 +421,51 @@ class Parser:
 		res.register_advancement()
 		self.advance()
 
-		if self.current_tok.type != TT_ARROW:
-			return res.faliure(InvalidSyntaxError(
-				self.current_tok.pos_start, self.current_tok.pos_end,
-				"Expected '->'"
+		if self.current_tok.type == TT_ARROW:
+			# return res.faliure(InvalidSyntaxError(
+			# 	self.current_tok.pos_start, self.current_tok.pos_end,
+			# 	"Expected '->'"
+			# ))
+
+			res.register_advancement()
+			self.advance()
+			node_to_return = res.register(self.expr())
+			if res.error: return res
+
+			return res.success(FuncDefNode(
+				var_name_tok, arg_name_toks,node_to_return,False
 			))
 
+		if self.current_tok.type != TT_NEWLINE:
+			return res.faliure(InvalidSyntaxError(
+					self.current_tok.pos_start, self.current_tok.pos_end,
+					"Expected '->' or NEWLINE "
+				))
 		res.register_advancement()
 		self.advance()
-		node_to_return = res.register(self.expr())
+
+		body = res.register(self.statements())
 		if res.error: return res
 
-		return res.success(FuncDefNode(
-			var_name_tok, arg_name_toks,node_to_return
-		))
+		if not self.current_tok.matches(TT_KEYWORD, 'end'):
+				return res.faliure(InvalidSyntaxError(
+				self.current_tok.pos_start, self.current_tok.pos_end,
+				"Expected 'end'"
+				))
+		res.register_advancement()
+		self.advance()
+
+		return res.success(
+			FuncDefNode(
+				var_name_tok,
+				arg_name_toks,
+				body,
+				True
+
+			)
+		)
+
+
 
 
 	def call(self):
