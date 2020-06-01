@@ -146,7 +146,7 @@ class Parser:
 				new_cases, else_cases = all_cases
 				cases.extend(new_cases)	
 		else:
-			expr = res.register(self.expr())
+			expr = res.register(self.statement())
 			if res.error: return res
 			cases.append((condition, expr, False))
 
@@ -187,7 +187,7 @@ class Parser:
 	 			"Expected 'end'"
 	 			))
 			else:
-				expr = res.register(self.expr())
+				expr = res.register(self.statement())
 				if res.error: return res
 				else_case = (expr, False)
 		return res.success(else_case)
@@ -296,7 +296,7 @@ class Parser:
 			self.advance()
 			return res.success(ForNode(var_name, start_value, end_value,step_value,body,True))
 
-		body = res.register(self.expr())
+		body = res.register(self.statement())
 		if res.error: return res
 
 		return res.success(ForNode(var_name,start_value,end_value,step_value,body,False))
@@ -344,7 +344,7 @@ class Parser:
 			return res.success(WhileNode(condition, body, True))
 
 
-		body = res.register(self.expr())
+		body = res.register(self.statement())
 		if res.error: return res
 
 		return res.success(WhileNode(condition, body, False))
@@ -727,7 +727,7 @@ class Parser:
 		if res.error:
 			return res.failure(InvalidSyntaxError(
 				self.current_tok.pos_start, self.current_tok.pos_end,
-				"Expected 'VAR', int, float, identifier, 'if', 'for', 'while','func','not','+', '-','(' or '['"
+				"Expected 'var', int, float, identifier, 'if', 'for', 'while','func','not','+', '-','(' or '['"
 			))
 
 		return res.success(node)
@@ -743,7 +743,7 @@ class Parser:
 			res.register_advancement()
 			self.advance()
 
-		statement = res.register(self.expr())
+		statement = res.register(self.statement())
 		if res.error: return res
 		statements.append(statement)
 
@@ -758,7 +758,7 @@ class Parser:
 				more_statement = False
 			if not more_statement:
 				break
-			statement = res.try_register(self.expr())
+			statement = res.try_register(self.statement())
 			if not statement:
 				self.reverse(res.to_reverse_count)
 				more_statement = False
@@ -772,6 +772,50 @@ class Parser:
 				self.current_tok.pos_end.copy()
 			)
 		)
+
+	def statement(self):
+		res = ParseResult()
+		pos_start = self.current_tok.pos_start.copy()
+
+		if self.current_tok.matches(TT_KEYWORD, 'return'):
+			res.register_advancement()
+			self.advance()
+
+			expr = res.try_register(self.expr())
+			if not expr:
+				self.reverse(res.to_reverse_count)
+			return res.success(ReturnNode(
+				expr,
+				pos_start,
+				self.current_tok.pos_start.copy()
+			))
+
+		if self.current_tok.matches(TT_KEYWORD, 'continue'):
+			res.register_advancement()
+			self.advance()
+
+			return res.success(ContinueNode(
+				pos_start,
+				self.current_tok.pos_start.copy()
+			))
+
+		if self.current_tok.matches(TT_KEYWORD, 'break'):
+			res.register_advancement()
+			self.advance()
+
+			return res.success(BreakNode(
+				pos_start,
+				self.current_tok.pos_start.copy()
+			))
+
+		expr = res.register(self.expr())
+		if res.error:
+			return res.failure(InvalidSyntaxError(
+				self.current_tok.pos_start, self.current_tok.pos_end,
+				"Expected 'break','continue','return','var', int, float, identifier, 'if', 'for', 'while','func','not','+', '-','(' or '['"
+			))
+
+		return res.success(expr)
 
 	###################################
 

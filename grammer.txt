@@ -4,8 +4,12 @@
 *****3. factor
 *****4. atom
 
-statements    : newline* expr (newline + expr)* newline
+statements    : newline* statement (newline + statement)* newline
               
+statement     : KEYWORD: return expr?
+              : KEYWORD: continue
+              : KEYWORD: break
+              : expr
 
 expression    : keyword: var identifier EQ expr
               : comp-expr((AND | OR) comp-expr)*
@@ -35,7 +39,7 @@ atom          : int | float | identifier | string
 list-expr     : LSQUARE (expr(comma expr)*)? RSQUARE
 
 if-expr       : KEYWORD: if expr KEYWORD: then
-                    (expr if-expr-elif| if-expr-else?)
+                    (statement if-expr-elif| if-expr-else?)
                     | (newline statements KEYWORD:end | if-expr-elif | if-expr-else)
 
 if-expr-elif   : KEYWORD: elif expr KEYWORD: then
@@ -48,10 +52,12 @@ if-expr-else  : KEYWORD: else
 
 for-expr      : KEYWORD:for identifier EQ expr KEYWORD:to expr
                 (KEYWORD:step expr)? KEYWORD:then
-                expr
+                statement
                 | (newline statements KEYWORD: end)
 
-while-expr    : KEYWORD:while expr KEYWORD:then expr 
+while-expr    : KEYWORD:while expr KEYWORD:then 
+                statement
+                | (newline statements KEYWORD: end)
 
 func-def      : KEYWORD:func identifier
                 lparen (identifier(comma identifier)*)? rparen
