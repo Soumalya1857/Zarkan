@@ -55,6 +55,8 @@ class BaseFunction(Value):
 		self.populate_args(arg_names, args, exec_cntx)
 		return res.success(None)
 
+	
+
 
 
 class Function(BaseFunction):
@@ -234,19 +236,72 @@ class BuiltInFunction(BaseFunction):
 		if not isinstance(list_A, List):
 			return RTResult().faliure(RTError(
 				self.pos_start, self.pos_end,
-				"First argumet must be of type list",
+				"First argument must be of type list",
 				exec_cntx
 			))
 		if not isinstance(list_B, List):
 			return RTResult().faliure(RTError(
 				self.pos_start, self.pos_end,
-				"Second argumet must be of type list",
+				"Second argument must be of type list",
 				exec_cntx
 			))
 
 		list_A.elements.extend(list_B.elements)
 		return RTResult().success(Number.null)
 	execute_extend.arg_names = ["listA", "listB"]
+
+
+
+	def execute_len(self, exec_cntx):
+		list_ = exec_cntx.symbol_table.get("list")
+
+		if not isinstance(list_, List):
+			return RTResult().faliure(RTError(
+				self.pos_start, self.pos_end,
+				"Argument must be of type list",
+				exec_cntx
+			))
+
+
+		return RTResult().success(Number(len(list_.elements)))
+	execute_len.arg_names = ["list"]
+
+	def execute_run(self, exec_cntx):
+		filename = exec_cntx.symbol_table.get("filename")
+
+		if not isinstance(filename, String):
+			return RTResult().faliure(RTError(
+				self.pos_start, self.pos_end,
+				"Argument must be a string",
+				exec_cntx
+			))
+
+		filename = filename.value
+
+		try:
+			with open(filename, "r") as f:
+				script = f.read()
+		except Exception as e:
+			return RTResult().faliure(RTError(
+				self.pos_start, self.pos_end,
+				f"failed to load script \"{filename}\"\n" + str(e),
+				exec_cntx
+			))
+		temp, error = run(filename, script)
+
+		if error: 
+			return RTResult().faliure(RTError(
+				self.pos_start, self.pos_end,
+				f"Failed to finish executing script \"{filename}\"\n" + error.as_string(),
+				exec_cntx
+			))
+		return RTResult().success(Number.null)
+	execute_run.arg_names = ["filename"]
+
+
+
+
+
 
 BuiltInFunction.print 			= BuiltInFunction("print")
 BuiltInFunction.print_ret 		= BuiltInFunction("print_ret")
@@ -260,6 +315,8 @@ BuiltInFunction.is_function 	= BuiltInFunction("is_function")
 BuiltInFunction.append 			= BuiltInFunction("append")
 BuiltInFunction.pop 			= BuiltInFunction("pop")
 BuiltInFunction.extend 			= BuiltInFunction("extend")
+BuiltInFunction.run 			= BuiltInFunction("run")
+BuiltInFunction.len 			= BuiltInFunction("len")
 
 
 ###############################################################
@@ -638,6 +695,8 @@ global_symbol_table.set("is_func", BuiltInFunction.is_function)
 global_symbol_table.set("append", BuiltInFunction.append)
 global_symbol_table.set("pop", BuiltInFunction.pop)
 global_symbol_table.set("extend", BuiltInFunction.extend)
+global_symbol_table.set("run", BuiltInFunction.run)
+global_symbol_table.set("len", BuiltInFunction.len)
 
 
 def run(fn, text):
