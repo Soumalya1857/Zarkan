@@ -200,11 +200,11 @@ class WhileNode:
 
 
 class FuncDefNode:
-	def __init__(self, var_name_tok, arg_name_toks, body_node,should_return_null):
+	def __init__(self, var_name_tok, arg_name_toks, body_node,should_auto_return):
 		self.var_name_tok = var_name_tok
 		self.arg_name_toks = arg_name_toks
 		self.body_node = body_node
-		self.should_return_null = should_return_null
+		self.should_auto_return = should_auto_return
 
 		if self.var_name_tok:
 			self.pos_start = self.var_name_tok.pos_start
@@ -253,21 +253,59 @@ class BreakNode:
 
 class RTResult:
 	def __init__(self):
+		# self.value = None
+		# self.error = None
+		# self.func_return_value = None
+		# self.loop_should_continue = False
+		# self.loop_should_break = False
+		self.reset()
+
+	def reset(self):
 		self.value = None
 		self.error = None
+		self.func_return_value = None
+		self.loop_should_continue = False
+		self.loop_should_break = False
 
 	def register(self, res):
-
-		if res.error: self.error = res.error
+		self.error = res.error
+		self.func_return_value = res.func_return_value
+		self.loop_should_break = res.loop_should_break
+		self.loop_should_continue = res.loop_should_continue
 		return res.value
 
-	def success(self, value):
+	def success_return(self, value):
+		self.reset()
+		self.func_return_value = value
+		return self	
+
+	def success_continue(self):
+		self.reset()
+		self.loop_should_continue = True
+		return self
+
+	def success_continue(self):
+		self.reset()
+		self.loop_should_break = True
+		return self
+
+	def success(self, value):#only value success
+		self.reset()
 		self.value = value
 		return self
 
 	def faliure(self, error):
+		self.reset()
 		self.error = error
 		return self
+
+	def should_return(self):
+		return (
+			self.error or
+			self.func_return_value or
+			self.loop_should_continue or
+			self.loop_should_break
+		)
 
 
 #######################################

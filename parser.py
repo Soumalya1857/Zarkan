@@ -433,7 +433,7 @@ class Parser:
 			if res.error: return res
 
 			return res.success(FuncDefNode(
-				var_name_tok, arg_name_toks,node_to_return,False
+				var_name_tok, arg_name_toks,node_to_return,True
 			))
 
 		if self.current_tok.type != TT_NEWLINE:
@@ -460,7 +460,7 @@ class Parser:
 				var_name_tok,
 				arg_name_toks,
 				body,
-				True
+				False
 
 			)
 		)
