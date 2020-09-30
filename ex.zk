@@ -1,0 +1,16 @@
+
+func add(a,b)
+    var res = a + b;
+    print("This is an addition function");
+    return res
+end
+
+var res = add(10,15)
+var l = []
+
+for i=1 to 10 then
+    var a = res + i
+    append(l,a)
+end
+
+print(l)
