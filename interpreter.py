@@ -229,27 +229,6 @@ class BuiltInFunction(BaseFunction):
 
 	execute_pop.arg_names = ['list','index']
 
-	def execute_extend(self, exec_cntx):
-		list_A = exec_cntx.symbol_table.get("listA")
-		list_B= exec_cntx.symbol_table.get("listB")
-
-		if not isinstance(list_A, List):
-			return RTResult().faliure(RTError(
-				self.pos_start, self.pos_end,
-				"First argument must be of type list",
-				exec_cntx
-			))
-		if not isinstance(list_B, List):
-			return RTResult().faliure(RTError(
-				self.pos_start, self.pos_end,
-				"Second argument must be of type list",
-				exec_cntx
-			))
-
-		list_A.elements.extend(list_B.elements)
-		return RTResult().success(Number.null)
-	execute_extend.arg_names = ["listA", "listB"]
-
 
 
 	def execute_len(self, exec_cntx):
