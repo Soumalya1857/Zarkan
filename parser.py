@@ -650,7 +650,8 @@ class Parser:
 			node = res.register(self.comp_expr())
 			if res.error: return res
 			return res.sucess(UnaryOpNode(op_tok, node))
-
+		node = res.register(self.bin_op(self.arith_expr, (TT_NE, TT_EE, TT_GT, TT_GTE, TT_LT, TT_LTE)))
+		
 		if res.error:
 			return res.failure(InvalidSyntaxError(
 				self.current_tok.pos_start, self.current_tok.pos_end,
@@ -658,7 +659,8 @@ class Parser:
 			))
 
 		return res.success(node)
-
+	def arith_expr(self):
+		return self.bin_op(self.term, (TT_PLUS, TT_MINUS))
 
 	def expr(self):
 		res = ParseResult()
