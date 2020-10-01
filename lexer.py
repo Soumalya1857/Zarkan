@@ -36,8 +36,8 @@ class Lexer:
 		while self.current_char != None:
 			if self.current_char in ' \t':
 				self.advance()
-# 			elif self.current_char == '#':
-# 				self.skip_comment()
+ 			elif self.current_char == '#':
+ 				self.skip_comment()
 			elif self.current_char in LETTERS:
 				tokens.append(self.make_identifier())
 			elif self.current_char in DIGITS:
@@ -214,7 +214,11 @@ class Lexer:
 		return Token(TT_STRING, string, pos_start, self.pos)
 
 
-
+        def skip_comment(self):
+			self.advance()
+			while self.current_char != '\n':
+				self.advance()
+			self.advance()
 
 
 
