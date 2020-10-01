@@ -623,11 +623,6 @@ class Parser:
 			"Expected int or float,identifier, 'if', 'for', 'while', 'func', '+', '-'. '(' or '[' "
 		))
 
-		
-
-
-	def power(self):
-		return self.bin_op(self.call, (TT_POW, ), self.factor)
 
 
 	def factor(self):
