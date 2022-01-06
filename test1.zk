@@ -1,0 +1,7 @@
+func greet(name, num) 
+   print(name * num) 
+
+end
+
+
+greet("Soumalya ",4)

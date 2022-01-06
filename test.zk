@@ -1,0 +1,7 @@
+var a = 25
+
+for i = 0 to 5 then
+    a = a + i;
+end
+
+print(a)
